@@ -12,21 +12,21 @@ import { AppProvider } from '../components/contexts/appContext';
 import { Footer } from '../components/footer';
 import { Header } from '../components/header';
 import { HeroPost } from '../components/hero-post';
-import { ArticleSVG, ChevronDownSVG } from '../components/icons';
+import { ArticleSVG,ChevronDownSVG } from '../components/icons';
 import { Layout } from '../components/layout';
 import { MorePosts } from '../components/more-posts';
 import { Navbar } from '../components/navbar';
 import { SecondaryPost } from '../components/secondary-post';
 import {
-	MorePostsByPublicationDocument,
-	MorePostsByPublicationQuery,
-	MorePostsByPublicationQueryVariables,
-	PageInfo,
-	PostFragment,
-	PostsByPublicationDocument,
-	PostsByPublicationQuery,
-	PostsByPublicationQueryVariables,
-	PublicationFragment,
+MorePostsByPublicationDocument,
+MorePostsByPublicationQuery,
+MorePostsByPublicationQueryVariables,
+PageInfo,
+PostFragment,
+PostsByPublicationDocument,
+PostsByPublicationQuery,
+PostsByPublicationQueryVariables,
+PublicationFragment,
 } from '../generated/graphql';
 import { DEFAULT_COVER } from '../utils/const';
 
@@ -81,6 +81,25 @@ export default function Index({ publication, initialAllPosts, initialPageInfo }:
 	});
 	const morePosts = allPosts.slice(4);
 
+	const koalaForUsers =
+		publication.integrations?.koalaPublicKey &&
+		`!function(t){if(window.ko)return;window.ko=[],
+    ["identify","track","removeListeners","on","off","qualify","ready"]
+    .forEach(function(t){ko[t]=function(){var n=[].slice.call(arguments);return n.unshift(t),ko.push(n),ko}});
+    var n=document.createElement("script");
+    n.async=!0,n.setAttribute("src","https://cdn.getkoala.com/v1/${encodeURI(
+			publication.integrations.koalaPublicKey,
+		)}/sdk.js"),
+    (document.body || document.head).appendChild(n)}();`;
+
+	const msClarityForUsers =
+		publication.integrations?.msClarityID &&
+		`(function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", '${publication.integrations?.msClarityID}');`;
+
 	return (
 		<AppProvider publication={publication}>
 			<Layout>
@@ -119,6 +138,8 @@ export default function Index({ publication, initialAllPosts, initialPageInfo }:
 							__html: JSON.stringify(addPublicationJsonLd(publication)),
 						}}
 					/>
+					{koalaForUsers && <script type="text/javascript" dangerouslySetInnerHTML={{ __html: koalaForUsers }} />}
+					{msClarityForUsers && <script type="text/javascript" dangerouslySetInnerHTML={{ __html: msClarityForUsers }} />}
 				</Head>
 				<Header />
 				<Container className="flex flex-col items-stretch gap-10 px-5 pb-10">

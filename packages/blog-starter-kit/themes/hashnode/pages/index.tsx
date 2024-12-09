@@ -89,6 +89,25 @@ export default function Index(
 			});
 	};
 
+	const koalaForUsers =
+		publication.integrations?.koalaPublicKey &&
+		`!function(t){if(window.ko)return;window.ko=[],
+    ["identify","track","removeListeners","on","off","qualify","ready"]
+    .forEach(function(t){ko[t]=function(){var n=[].slice.call(arguments);return n.unshift(t),ko.push(n),ko}});
+    var n=document.createElement("script");
+    n.async=!0,n.setAttribute("src","https://cdn.getkoala.com/v1/${encodeURI(
+			publication.integrations.koalaPublicKey,
+		)}/sdk.js"),
+    (document.body || document.head).appendChild(n)}();`;
+
+	const msClarityForUsers =
+		publication.integrations?.msClarityID &&
+		`(function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", '${publication.integrations?.msClarityID}');`;
+
 	return (
 		<AppProvider publication={publication}>
 			<Layout>
@@ -127,6 +146,10 @@ export default function Index(
 							__html: JSON.stringify(addPublicationJsonLd(publication)),
 						}}
 					/>
+					{koalaForUsers && <script type="text/javascript" dangerouslySetInnerHTML={{ __html: koalaForUsers }} />}
+					{msClarityForUsers && (
+						<script type="text/javascript" dangerouslySetInnerHTML={{ __html: msClarityForUsers }} />
+					)}
 				</Head>
 				<Header isHome={true} />
 				<div>
@@ -138,9 +161,7 @@ export default function Index(
 					) : null}
 
 					{publication.about?.html ? (
-						<div
-							className="blog-author-container border-b dark:border-slate-800"
-						>
+						<div className="blog-author-container border-b dark:border-slate-800">
 							<div
 								className={twJoin(
 									'blog-author-area feed-width mx-auto md:w-3/4 lg:w-2/3',
